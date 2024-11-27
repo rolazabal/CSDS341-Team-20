@@ -12,13 +12,13 @@ import java.util.Scanner;
 
 public class GameDatabaseUI {
     static String connectionUrl = 
-            "jdbc:sqlserver://cxp-sql-03\\mls384;"
-            + "database=DBQuest;"
-            + "user=proj;"
-            + "password=ProjPass1234!;"
+            "jdbc:sqlserver://cxp-sql-03\\rfo10;"
+            + "database=project;"
+            + "user=dbo;"
+            + "password=csds341143sdsc;"
             + "encrypt=true;"
             + "trustServerCertificate=true;"
-            + "loginTimeout=15;";
+            + "loginTimeout=20;";
 
     private static String username = null;
     private static boolean loggedIn = false;
