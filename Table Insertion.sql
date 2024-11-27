@@ -196,6 +196,7 @@ VALUES
 (7, 220, 'Find the Boots of Agility hidden in the Misty Swamp.', 80), -- Quest 8
 (8, 180, 'Recover the Helmet of Brilliance from the Crystal Mines.', 90), -- Quest 9
 (9, 500, 'Uncover the Cloak of Invisibility in the Forbidden Forest.', 250); -- Quest 10
+(0, 40, 'Tutorial', 0) -- Quest 11
 
 -- Assign quest completions to characters
 INSERT INTO hasCompleted (questID, charID)
