@@ -8,23 +8,23 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner; 
+import java.util.Scanner;
 
 public class GameDatabaseUI {
-    static String connectionUrl = 
+    static String connectionUrl =
             "jdbc:sqlserver://cxp-sql-03\\rfo10;"
-            + "database=project;"
-            + "user=dbo;"
-            + "password=csds341143sdsc;"
-            + "encrypt=true;"
-            + "trustServerCertificate=true;"
-            + "loginTimeout=20;";
+                    + "database=project;"
+                    + "user=dbo;"
+                    + "password=csds341143sdsc;"
+                    + "encrypt=true;"
+                    + "trustServerCertificate=true;"
+                    + "loginTimeout=20;";
 
     private static String username = null;
     private static boolean loggedIn = false;
 
     public static void main(String[] args) {
-         try (Connection connection = DriverManager.getConnection(connectionUrl);)
+        try (Connection connection = DriverManager.getConnection(connectionUrl))
         {
             System.out.println("Connected to the database successfully!");
             connection.setAutoCommit(false); // Enable manual transaction control
@@ -67,7 +67,7 @@ public class GameDatabaseUI {
                     System.out.print("Enter your choice: ");
                     int choice = scanner.nextInt();
                     scanner.nextLine();
-    
+
                     switch (choice) {
                         case 1:
                             loggedIn = false;
@@ -84,7 +84,7 @@ public class GameDatabaseUI {
                         case 4:
                             newCharacter(connection, scanner, playerID);
                             break;
-    
+
                     }
                 }
             }
@@ -96,56 +96,56 @@ public class GameDatabaseUI {
 
     public static void newCharacter(Connection connection, Scanner scanner, int playerID) {
         boolean localRunning = true;
-    
+
         while (localRunning) {
             System.out.println("\nInsert Character Name:");
             String name = scanner.nextLine();
-    
+
             System.out.println("\nSelect Class:");
             String classView = "SELECT classID, name, health, stamina, speed FROM class";
-    
+
             try (PreparedStatement choiceCall = connection.prepareStatement(classView)) {
                 ResultSet resultSet = choiceCall.executeQuery();
-    
+
                 System.out.printf("%-5s %-20s %-10s %-10s %-10s%n", "ID", "Class Name", "Health", "Stamina", "Speed");
                 System.out.println("---------------------------------------------------------------");
-    
+
                 while (resultSet.next()) {
                     int classID = resultSet.getInt("classID");
                     String className = resultSet.getString("name");
                     int health = resultSet.getInt("health");
                     int stamina = resultSet.getInt("stamina");
                     int speed = resultSet.getInt("speed");
-    
+
                     System.out.printf("%-5d %-20s %-10d %-10d %-10d%n", classID, className, health, stamina, speed);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-    
+
             System.out.print("\nEnter the class ID of your choice: ");
             int choice = scanner.nextInt();
             scanner.nextLine();
-    
+
             if (name.length() > 4) {
                 String sql = "{CALL newCharacter(?, ?, ?, ?)}";
-    
+
                 try (CallableStatement callableStatement = connection.prepareCall(sql)) {
                     connection.setAutoCommit(false); // Start transaction
-    
+
                     callableStatement.setInt(1, playerID);
                     callableStatement.setInt(2, choice);
                     callableStatement.setString(3, name);
                     callableStatement.registerOutParameter(4, Types.INTEGER);
-    
+
                     callableStatement.execute();
-    
+
                     int newCharacterID = callableStatement.getInt(4);
                     System.out.println("New character created with ID: " + newCharacterID);
-    
+
                     connection.commit(); // Commit transaction
                     localRunning = false;
-    
+
                 } catch (SQLException e) {
                     try {
                         connection.rollback(); // Roll back transaction
@@ -166,36 +166,36 @@ public class GameDatabaseUI {
             }
         }
     }
-    
+
     public static void signup(Connection connection, Scanner scanner) {
         boolean localrunning = true;
-    
+
         while (localrunning) {
             System.out.println("Enter your username: ");
             String inputUsername = scanner.nextLine();
-    
+
             System.out.println("Enter your password: ");
             String inputPassword = scanner.nextLine();
-    
+
             if (inputPassword.length() < 4 || inputUsername.length() < 4) {
                 System.out.println("Please enter a password and username of at least 4 characters.");
             } else {
                 String sql = "SELECT * FROM player WHERE username = ?";
-    
+
                 try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                     preparedStatement.setString(1, inputUsername);
-    
+
                     ResultSet resultSet = preparedStatement.executeQuery();
-    
+
                     if (!resultSet.isBeforeFirst()) { // Username not found
                         String signupCall = "{CALL newPlayer(?, ?)}";
                         try (CallableStatement signupCallableStatement = connection.prepareCall(signupCall)) {
                             connection.setAutoCommit(false); // Start transaction
-    
+
                             signupCallableStatement.setString(1, inputUsername);
                             signupCallableStatement.setString(2, inputPassword);
                             signupCallableStatement.execute();
-    
+
                             connection.commit(); // Commit transaction
                             localrunning = false;
                             System.out.println("Success! Please log in.");
@@ -223,7 +223,7 @@ public class GameDatabaseUI {
             }
         }
     }
-    
+
 
     public static int login(Connection connection, Scanner scanner) {
 
@@ -266,7 +266,7 @@ public class GameDatabaseUI {
 
     public static void fetchCharacters(Connection connection) {
         System.out.println("fetching Characters");
-        String sql = "{CALL fetchCharacters(?)}"; 
+        String sql = "{CALL fetchCharacters(?)}";
 
         try (CallableStatement callableStatement = connection.prepareCall(sql)) {
             callableStatement.setString(1, username);
@@ -362,7 +362,7 @@ public class GameDatabaseUI {
         } catch (SQLException e) {
             e.printStackTrace(); // Print error details
         }
-        
+
         System.out.println(characterIDs.toString());
 
         return characterIDs; // Return the ArrayList of character IDs
@@ -377,10 +377,12 @@ public class GameDatabaseUI {
             System.out.println("2. View Completed Quests");
             System.out.println("3. View Inventory");
             System.out.println("4. Register Completed Quest");
-            System.out.println("5. View Guild");
-            System.out.println("6. Join Guild");
-            System.out.println("7. Leave Guild");
-            System.out.println("8. Exit");
+            System.out.println("5. Start Guild");
+            System.out.println("6. View Guild");
+            System.out.println("7. Join Guild");
+            System.out.println("8. Leave Guild");
+            System.out.println("9. Change Guild Leadership");
+            System.out.println("10. Exit");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -397,17 +399,23 @@ public class GameDatabaseUI {
                 case 4:
                     completeQuest(connection, scanner, charID);
                     break;
-                case 8:
+                case 10:
                     localrunning = false;
                     break;
                 case 5:
-                    fetchGuild(connection, charID);
+                    startGuild(connection, charID);
                     break;
                 case 6:
+                    fetchGuild(connection, charID);
+                    break;
+                case 7:
                     joinGuild(connection, scanner, charID);
                     break;
-                case 7: 
+                case 8:
                     leaveGuild(connection, charID);
+                    break;
+                case 9:
+                    changeGuildLeader(connection, scanner, charID);
                     break;
                 default:
                     System.out.println("Please input a valid choice.");
@@ -533,20 +541,20 @@ public class GameDatabaseUI {
 
     public static void completeQuest(Connection connection, Scanner scanner, int charID) {
         String sql = "SELECT q.questID, q.objective, q.minXp, q.xpReward, i.name, i.attack, i.defense " +
-                     "FROM quest q " +
-                     "JOIN item i ON i.itemID = q.itemRewardID";
-    
+                "FROM quest q " +
+                "JOIN item i ON i.itemID = q.itemRewardID";
+
         HashMap<Integer, Integer> questMap = new HashMap<>(); // Map index to questID
-    
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             // Execute the query
             ResultSet resultSet = preparedStatement.executeQuery();
-    
+
             // Print the table header
             System.out.printf("%-5s %-50s %-10s %-10s %-15s %-10s %-10s%n",
                     "Index", "Objective", "Min XP", "XP Reward", "Item Name", "Attack", "Defense");
             System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
-    
+
             int index = 1; // Initialize index for user selection
             while (resultSet.next()) {
                 int questID = resultSet.getInt("questID");
@@ -556,11 +564,11 @@ public class GameDatabaseUI {
                 String itemName = resultSet.getString("name");
                 int attack = resultSet.getInt("attack");
                 int defense = resultSet.getInt("defense");
-    
+
                 // Print each quest's details with an index
                 System.out.printf("%-5d %-50s %-10d %-10d %-15s %-10d %-10d%n",
                         index, objective, minXp, xpReward, itemName, attack, defense);
-    
+
                 // Map the index to the questID
                 questMap.put(index, questID);
                 index++;
@@ -569,17 +577,17 @@ public class GameDatabaseUI {
             e.printStackTrace(); // Print error details
             return; // Exit the method on failure
         }
-    
+
         boolean localRunning = true;
         while (localRunning) {
             // Prompt the user to select a quest
             System.out.println("\nSelect Quest to complete by index:");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
-    
+
             if (questMap.containsKey(choice)) {
                 int selectedQuestID = questMap.get(choice);
-    
+
                 try {
                     // Fetch minXp for the selected quest
                     int minXP = 0;
@@ -591,7 +599,7 @@ public class GameDatabaseUI {
                             minXP = xpRs.getInt("minXp");
                         }
                     }
-    
+
                     // Fetch current XP for the character
                     int charXP = 0;
                     String charXpQuery = "SELECT xp FROM character WHERE charID = ?";
@@ -602,17 +610,17 @@ public class GameDatabaseUI {
                             charXP = charXpRs.getInt("xp");
                         }
                     }
-    
+
                     // Check if character has enough XP
                     if (charXP >= minXP) {
                         // Call the stored procedure
                         String procCall = "{CALL questCompletion(?, ?)}";
-    
+
                         connection.setAutoCommit(false); // Start transaction
                         try (CallableStatement cs = connection.prepareCall(procCall)) {
                             cs.setInt(1, charID);
                             cs.setInt(2, selectedQuestID);
-    
+
                             cs.execute(); // Execute the stored procedure
                             connection.commit(); // Commit the transaction
                             System.out.println("Quest completed successfully!");
@@ -623,12 +631,12 @@ public class GameDatabaseUI {
                         } finally {
                             connection.setAutoCommit(true); // Reset auto-commit mode
                         }
-    
+
                         localRunning = false; // Exit the loop on successful completion
                     } else {
                         System.out.println("Your XP is too low to complete this quest!");
                     }
-    
+
                 } catch (SQLException e) {
                     e.printStackTrace(); // Print error details
                 }
@@ -637,8 +645,8 @@ public class GameDatabaseUI {
             }
         }
     }
-    
-    
+
+
 
     public static void fetchInventory(Connection connection, int charID) {
         String sql = "{CALL fetchInventory(?)}"; // Stored procedure call
@@ -757,6 +765,100 @@ public class GameDatabaseUI {
             e.printStackTrace(); // Print error details
         }
     }
+
+    public static void startGuild(Connection connection, int charID) {
+        String sql = "{CALL createGuild(?)}"; // stored procedure call
+        // get today's Date
+        java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+        try (CallableStatement callableStatement = connection.prepareCall(sql)) {
+            // start transaction
+            connection.setAutoCommit(false);
+            // set input params
+            callableStatement.setInt(1, charID);
+            callableStatement.setDate(2, sqlDate);
+            // set output params
+            callableStatement.registerOutParameter(3, java.sql.Types.INTEGER);
+            // execute stored procedure
+            callableStatement.execute();
+            // commit changes
+            connection.commit();
+            // success message
+            System.out.println("Successfully created a new guild with ID " + callableStatement.getInt(3));
+        } catch (SQLException e) {
+            // print error message
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+    public static boolean changeGuildLeader(Connection connection, Scanner scanner, int charID) {
+        // check if character is leader of guild
+        // stored procedures
+        String guildMembersSql = "{CALL fetchLeaderCandidates(?, ?)}";
+        String transferLeaderSql = "{CALL changeGuildLeader(?)}";
+        // guild id of character
+        int guildID = -1;
+        // get array of memberIDs
+        ArrayList<Integer> memberIDs = new ArrayList<Integer>();
+        // empty result set
+        ResultSet rs = null;
+        // call check statement
+        try (CallableStatement checkStatement = connection.prepareCall(guildMembersSql)) {
+            // set input params
+            checkStatement.setInt(1, charID);
+            checkStatement.registerOutParameter(2, java.sql.Types.INTEGER);
+            // execute stored procedure and populate result set
+            rs = checkStatement.executeQuery();
+            // set character guild variable
+            guildID = checkStatement.getInt(2);
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+            return false;
+        }
+        // execute change procedure
+        try (CallableStatement changeStatement = connection.prepareCall(transferLeaderSql)) {
+            // input loop
+            boolean localRunning = true;
+            while (localRunning) {
+                // print results of checkStatement
+                ResultSet copyRs = rs;
+                int i = 0;
+                System.out.printf("%-5s %-20s %-20s %-10s%n",
+                        "No.", "Name", "Class", "Xp");
+                System.out.println("----------------------------"
+                        + "-----------------------------------------------");
+                while (copyRs.next()) {
+                    i++;
+                    memberIDs.add(copyRs.getInt("ID"));
+                    String charName = copyRs.getString("name");
+                    String className = copyRs.getString("class");
+                    int xp = rs.getInt("xp");
+                    System.out.printf("%-5d %-20s %-20s %-10d%n",
+                            i, charName, className, xp);
+                }
+                // prompt user for input, which member to designate as new leader
+                System.out.print("\nSelect the character to transfer leadership to: ");
+                int newLeader = memberIDs.get(scanner.nextInt() - 1);
+                scanner.nextLine();
+                // start transaction
+                connection.setAutoCommit(false);
+                // set input params
+                changeStatement.setInt(1, guildID);
+                changeStatement.setInt(2, newLeader);
+                // set output params
+                changeStatement.registerOutParameter(3, java.sql.Types.INTEGER);
+                // execute stored procedure
+                changeStatement.execute();
+                // commit changes
+                connection.commit();
+                // success message
+                System.out.println("Successfully transfered leadership of guild to character"
+                        + " with ID " + changeStatement.getInt(3));
+                localRunning = false;
+                return true;
+            }
+        } catch (SQLException e) {
+            // handle exception
+            System.out.println("Error: " + e.getMessage());
+        }
+        return false;
+    }
 }
-
-
