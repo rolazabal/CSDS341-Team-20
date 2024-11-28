@@ -7,10 +7,10 @@ CREATE OR ALTER PROCEDURE newCharacter
 	@newID INT OUTPUT
 AS
 BEGIN
-	-- Ensure playerID is valud
+	-- Ensure playerID is valid
 	IF NOT EXISTS (SELECT 1 FROM player WHERE playerID = @playerID) OR NOT EXISTS (SELECT 1 FROM class WHERE classID = @classID)
 	BEGIN
-		RAISERROR ('Invalid playerID/clasID. Please check the values.', 16, 1);
+		RAISERROR ('Invalid playerID/classID. Please check the values.', 16, 1);
 		RETURN;
 	END
 	ELSE

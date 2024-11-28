@@ -21,6 +21,6 @@ BEGIN
     ELSE
     BEGIN
         -- Login failed
-        SELECT NULL AS playerID, 'Invalid username or password' AS resultMessage;
+        SELECT -1 AS playerID, 'Invalid username or password' AS resultMessage;
     END
 END;
